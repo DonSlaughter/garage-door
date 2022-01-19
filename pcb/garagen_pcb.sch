@@ -1,0 +1,430 @@
+EESchema Schematic File Version 4
+EELAYER 30 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L power:+5V #PWR0110
+U 1 1 61B7DE5F
+P 3500 900
+F 0 "#PWR0110" H 3500 750 50  0001 C CNN
+F 1 "+5V" H 3515 1073 50  0000 C CNN
+F 2 "" H 3500 900 50  0001 C CNN
+F 3 "" H 3500 900 50  0001 C CNN
+	1    3500 900 
+	1    0    0    -1  
+$EndComp
+$Comp
+L MCU_Module:Arduino_Nano_v3.x A1
+U 1 1 61B612AF
+P 2250 2750
+F 0 "A1" H 1900 1800 50  0000 C CNN
+F 1 "Arduino_Nano_v3.x" H 2750 1800 50  0000 C CNN
+F 2 "Module:Arduino_Nano" H 2250 2750 50  0001 C CIN
+F 3 "http://www.mouser.com/pdfdocs/Gravitech_Arduino_Nano3_0.pdf" H 2250 2750 50  0001 C CNN
+	1    2250 2750
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:CP_Small C3
+U 1 1 61B87F56
+P 3000 1300
+F 0 "C3" H 3088 1346 50  0000 L CNN
+F 1 "120uF" H 3088 1255 50  0000 L CNN
+F 2 "Capacitor_SMD:CP_Elec_6.3x5.9" H 3000 1300 50  0001 C CNN
+F 3 "~" H 3000 1300 50  0001 C CNN
+	1    3000 1300
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C_Small C4
+U 1 1 61B89202
+P 3500 1300
+F 0 "C4" H 3592 1346 50  0000 L CNN
+F 1 "100nF" H 3592 1255 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder" H 3500 1300 50  0001 C CNN
+F 3 "~" H 3500 1300 50  0001 C CNN
+	1    3500 1300
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3500 900  3500 1200
+Wire Wire Line
+	3500 1200 3000 1200
+Wire Wire Line
+	2450 1200 2450 1750
+Connection ~ 3500 1200
+Connection ~ 3000 1200
+Wire Wire Line
+	3000 1200 2450 1200
+Wire Wire Line
+	3000 1400 3500 1400
+Wire Wire Line
+	3500 1400 3500 1600
+Connection ~ 3500 1400
+$Comp
+L power:GND #PWR0101
+U 1 1 61B8CC0A
+P 3500 1600
+F 0 "#PWR0101" H 3500 1350 50  0001 C CNN
+F 1 "GND" H 3505 1427 50  0000 C CNN
+F 2 "" H 3500 1600 50  0001 C CNN
+F 3 "" H 3500 1600 50  0001 C CNN
+	1    3500 1600
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0102
+U 1 1 61B8D37B
+P 2250 4050
+F 0 "#PWR0102" H 2250 3800 50  0001 C CNN
+F 1 "GND" H 2255 3877 50  0000 C CNN
+F 2 "" H 2250 4050 50  0001 C CNN
+F 3 "" H 2250 4050 50  0001 C CNN
+	1    2250 4050
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2250 4050 2250 3750
+Wire Wire Line
+	2250 3750 2350 3750
+Connection ~ 2250 3750
+$Comp
+L Transistor_FET:IRLZ44N Q3
+U 1 1 61C721F9
+P 5950 4600
+F 0 "Q3" H 6154 4646 50  0000 L CNN
+F 1 "IRLZ44N" H 6154 4555 50  0000 L CNN
+F 2 "Package_TO_SOT_THT:TO-220-3_Vertical" H 6200 4525 50  0001 L CIN
+F 3 "http://www.irf.com/product-info/datasheets/data/irlz44n.pdf" H 5950 4600 50  0001 L CNN
+	1    5950 4600
+	1    0    0    -1  
+$EndComp
+$Comp
+L Transistor_FET:IRLZ44N Q4
+U 1 1 61C74EDE
+P 9250 4600
+F 0 "Q4" H 9455 4646 50  0000 L CNN
+F 1 "IRLZ44N" H 9455 4555 50  0000 L CNN
+F 2 "Package_TO_SOT_THT:TO-220-3_Vertical" H 9500 4525 50  0001 L CIN
+F 3 "http://www.irf.com/product-info/datasheets/data/irlz44n.pdf" H 9250 4600 50  0001 L CNN
+	1    9250 4600
+	-1   0    0    -1  
+$EndComp
+$Comp
+L Regulator_Linear:MC78M05_TO252 U1
+U 1 1 61C8434C
+P 3100 6750
+F 0 "U1" H 3100 6992 50  0000 C CNN
+F 1 "MC78M05_TO252" H 3100 6901 50  0000 C CNN
+F 2 "Package_TO_SOT_SMD:TO-252-2" H 3100 6975 50  0001 C CIN
+F 3 "https://www.onsemi.com/pub/Collateral/MC78M00-D.PDF" H 3100 6700 50  0001 C CNN
+	1    3100 6750
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:Jack-DC J1
+U 1 1 61C85F98
+P 1300 6850
+F 0 "J1" H 1357 7175 50  0000 C CNN
+F 1 "Jack-DC" H 1357 7084 50  0000 C CNN
+F 2 "Connector_BarrelJack:BarrelJack_Horizontal" H 1350 6810 50  0001 C CNN
+F 3 "~" H 1350 6810 50  0001 C CNN
+	1    1300 6850
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:Screw_Terminal_01x02 J2
+U 1 1 61C86E68
+P 1350 6050
+F 0 "J2" H 1268 6267 50  0000 C CNN
+F 1 "Screw_Terminal_01x02" H 1268 6176 50  0000 C CNN
+F 2 "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-2-5.0-H_1x02_P5.00mm_Horizontal" H 1350 6050 50  0001 C CNN
+F 3 "~" H 1350 6050 50  0001 C CNN
+	1    1350 6050
+	-1   0    0    -1  
+$EndComp
+Wire Wire Line
+	1600 6750 2300 6750
+Wire Wire Line
+	1550 6050 2300 6050
+Wire Wire Line
+	2300 6050 2300 6750
+Connection ~ 2300 6750
+Wire Wire Line
+	2300 6750 2800 6750
+Wire Wire Line
+	1550 6150 1800 6150
+Wire Wire Line
+	1800 6150 1800 6350
+$Comp
+L power:GND #PWR0103
+U 1 1 61C88DF1
+P 1800 6350
+F 0 "#PWR0103" H 1800 6100 50  0001 C CNN
+F 1 "GND" H 1805 6177 50  0000 C CNN
+F 2 "" H 1800 6350 50  0001 C CNN
+F 3 "" H 1800 6350 50  0001 C CNN
+	1    1800 6350
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0104
+U 1 1 61C89262
+P 1800 7200
+F 0 "#PWR0104" H 1800 6950 50  0001 C CNN
+F 1 "GND" H 1805 7027 50  0000 C CNN
+F 2 "" H 1800 7200 50  0001 C CNN
+F 3 "" H 1800 7200 50  0001 C CNN
+	1    1800 7200
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1600 6950 1800 6950
+Wire Wire Line
+	1800 6950 1800 7200
+$Comp
+L power:GND #PWR0105
+U 1 1 61C8A083
+P 3100 7200
+F 0 "#PWR0105" H 3100 6950 50  0001 C CNN
+F 1 "GND" H 3105 7027 50  0000 C CNN
+F 2 "" H 3100 7200 50  0001 C CNN
+F 3 "" H 3100 7200 50  0001 C CNN
+	1    3100 7200
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3100 7200 3100 7050
+Wire Wire Line
+	3400 6750 4000 6750
+Wire Wire Line
+	4000 6750 4000 6500
+$Comp
+L power:+5V #PWR0106
+U 1 1 61C8ABD4
+P 4000 6500
+F 0 "#PWR0106" H 4000 6350 50  0001 C CNN
+F 1 "+5V" H 4015 6673 50  0000 C CNN
+F 2 "" H 4000 6500 50  0001 C CNN
+F 3 "" H 4000 6500 50  0001 C CNN
+	1    4000 6500
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+12V #PWR0107
+U 1 1 61C8B428
+P 2300 5850
+F 0 "#PWR0107" H 2300 5700 50  0001 C CNN
+F 1 "+12V" H 2315 6023 50  0000 C CNN
+F 2 "" H 2300 5850 50  0001 C CNN
+F 3 "" H 2300 5850 50  0001 C CNN
+	1    2300 5850
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2300 5850 2300 6050
+Connection ~ 2300 6050
+$Comp
+L Transistor_FET:IRF9540N Q1
+U 1 1 61C8D6DE
+P 5950 3150
+F 0 "Q1" H 6155 3196 50  0000 L CNN
+F 1 "IRF5305" H 6155 3105 50  0000 L CNN
+F 2 "Package_TO_SOT_THT:TO-220-3_Vertical" H 6150 3075 50  0001 L CIN
+F 3 "http://www.irf.com/product-info/datasheets/data/irf9540n.pdf" H 5950 3150 50  0001 L CNN
+	1    5950 3150
+	1    0    0    -1  
+$EndComp
+$Comp
+L Transistor_FET:IRF9540N Q2
+U 1 1 61C8FC24
+P 9250 3150
+F 0 "Q2" H 9455 3196 50  0000 L CNN
+F 1 "IRF5305" H 9455 3105 50  0000 L CNN
+F 2 "Package_TO_SOT_THT:TO-220-3_Vertical" H 9450 3075 50  0001 L CIN
+F 3 "http://www.irf.com/product-info/datasheets/data/irf9540n.pdf" H 9250 3150 50  0001 L CNN
+	1    9250 3150
+	-1   0    0    -1  
+$EndComp
+$Comp
+L Connector:Screw_Terminal_01x02 J3
+U 1 1 61C935D6
+P 7550 3950
+F 0 "J3" V 7550 4100 50  0000 C CNN
+F 1 "Motor_Connection" V 7650 3900 50  0000 C CNN
+F 2 "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-2-5.0-H_1x02_P5.00mm_Horizontal" H 7550 3950 50  0001 C CNN
+F 3 "~" H 7550 3950 50  0001 C CNN
+	1    7550 3950
+	0    -1   1    0   
+$EndComp
+$Comp
+L Device:D_Schottky_Small D1
+U 1 1 61C9BCCE
+P 6800 3150
+F 0 "D1" V 6800 2950 50  0000 L CNN
+F 1 "DSS 10-0045B" H 6550 3250 50  0000 L CNN
+F 2 "Package_TO_SOT_THT:TO-220-2_Vertical" V 6800 3150 50  0001 C CNN
+F 3 "~" V 6800 3150 50  0001 C CNN
+	1    6800 3150
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:D_Schottky_Small D?
+U 1 1 61CB6AC9
+P 6800 4600
+F 0 "D?" V 6800 4400 50  0000 L CNN
+F 1 "DSS 10-0045B" H 6550 4700 50  0000 L CNN
+F 2 "Package_TO_SOT_THT:TO-220-2_Vertical" V 6800 4600 50  0001 C CNN
+F 3 "~" V 6800 4600 50  0001 C CNN
+	1    6800 4600
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:D_Schottky_Small D?
+U 1 1 61CB70AB
+P 8250 4600
+F 0 "D?" V 8250 4700 50  0000 L CNN
+F 1 "DSS 10-0045B" H 8000 4500 50  0000 L CNN
+F 2 "Package_TO_SOT_THT:TO-220-2_Vertical" V 8250 4600 50  0001 C CNN
+F 3 "~" V 8250 4600 50  0001 C CNN
+	1    8250 4600
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:D_Schottky_Small D?
+U 1 1 61CBC378
+P 8250 3150
+F 0 "D?" V 8250 3250 50  0000 L CNN
+F 1 "DSS 10-0045B" H 8000 3050 50  0000 L CNN
+F 2 "Package_TO_SOT_THT:TO-220-2_Vertical" V 8250 3150 50  0001 C CNN
+F 3 "~" V 8250 3150 50  0001 C CNN
+	1    8250 3150
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	6800 3050 6800 2950
+Wire Wire Line
+	6800 2950 6050 2950
+Wire Wire Line
+	6800 3250 6800 3350
+Wire Wire Line
+	6800 3350 6050 3350
+Wire Wire Line
+	6800 4500 6800 4400
+Wire Wire Line
+	6800 4400 6050 4400
+Wire Wire Line
+	6050 4800 6800 4800
+Wire Wire Line
+	6800 4800 6800 4700
+Wire Wire Line
+	8250 4500 8250 4400
+Wire Wire Line
+	8250 4400 9150 4400
+Wire Wire Line
+	9150 4800 8250 4800
+Wire Wire Line
+	8250 4800 8250 4700
+Wire Wire Line
+	9150 3350 8250 3350
+Wire Wire Line
+	8250 3250 8250 3350
+Wire Wire Line
+	8250 3050 8250 2950
+Wire Wire Line
+	8250 2950 9150 2950
+Wire Wire Line
+	6050 3350 6050 3750
+Connection ~ 6050 3350
+Connection ~ 6050 4400
+Wire Wire Line
+	7550 3750 6050 3750
+Connection ~ 6050 3750
+Wire Wire Line
+	6050 3750 6050 4400
+Wire Wire Line
+	9150 3350 9150 3750
+Connection ~ 9150 3350
+Connection ~ 9150 4400
+Wire Wire Line
+	7650 3750 9150 3750
+Connection ~ 9150 3750
+Wire Wire Line
+	9150 3750 9150 4400
+$Comp
+L Device:R_Small R?
+U 1 1 61CE9310
+P 5150 2850
+F 0 "R?" H 5091 2804 50  0000 R CNN
+F 1 "1k" H 5091 2895 50  0000 R CNN
+F 2 "" H 5150 2850 50  0001 C CNN
+F 3 "~" H 5150 2850 50  0001 C CNN
+	1    5150 2850
+	-1   0    0    1   
+$EndComp
+$Comp
+L Transistor_BJT:BC546 Q?
+U 1 1 61CEE094
+P 5050 3350
+F 0 "Q?" H 5241 3396 50  0000 L CNN
+F 1 "BC546" H 5241 3305 50  0000 L CNN
+F 2 "Package_TO_SOT_THT:TO-92_Inline" H 5250 3275 50  0001 L CIN
+F 3 "https://www.onsemi.com/pub/Collateral/BC550-D.pdf" H 5050 3350 50  0001 L CNN
+	1    5050 3350
+	1    0    0    -1  
+$EndComp
+$Comp
+L Transistor_BJT:BC546 Q?
+U 1 1 61CF05DA
+P 9900 3350
+F 0 "Q?" H 10091 3396 50  0000 L CNN
+F 1 "BC546" H 10091 3305 50  0000 L CNN
+F 2 "Package_TO_SOT_THT:TO-92_Inline" H 10100 3275 50  0001 L CIN
+F 3 "https://www.onsemi.com/pub/Collateral/BC550-D.pdf" H 9900 3350 50  0001 L CNN
+	1    9900 3350
+	-1   0    0    -1  
+$EndComp
+$Comp
+L power:+12V #PWR?
+U 1 1 61CFFB59
+P 7600 2000
+F 0 "#PWR?" H 7600 1850 50  0001 C CNN
+F 1 "+12V" H 7615 2173 50  0000 C CNN
+F 2 "" H 7600 2000 50  0001 C CNN
+F 3 "" H 7600 2000 50  0001 C CNN
+	1    7600 2000
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R_Small R?
+U 1 1 61D028E4
+P 4500 3350
+F 0 "R?" V 4696 3350 50  0000 C CNN
+F 1 "1k" V 4605 3350 50  0000 C CNN
+F 2 "" H 4500 3350 50  0001 C CNN
+F 3 "~" H 4500 3350 50  0001 C CNN
+	1    4500 3350
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	4600 3350 4850 3350
+Wire Wire Line
+	5150 2750 5150 2500
+Wire Wire Line
+	5150 2500 7600 2500
+Wire Wire Line
+	7600 2500 7600 2000
+Wire Wire Line
+	5150 2950 5150 3150
+$EndSCHEMATC

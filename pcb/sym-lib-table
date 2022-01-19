@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name "tsr")(type "Legacy")(uri "${KIPRJMOD}/ext_libs/TSR_2-2450/TSR_2-2450.lib")(options "")(descr ""))
+)
