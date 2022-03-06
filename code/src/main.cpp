@@ -21,8 +21,11 @@ int last_button_state = HIGH;
 unsigned long last_debounce_time;
 unsigned long debounce_delay = 50;
 
+uint8_t status = 0;
+
 //Function Prototypes
 uint8_t open_door();
+uint8_t close_door();
 void force_open_door();
 void force_close_door();
 void stop_door();
@@ -62,26 +65,75 @@ void loop()
 			button_state_signal = reading_signal_button;
 			if (button_state_signal == LOW) {
 				Serial.println("pressed");
+				switch (status) {
+					case (0):
+						stop_door();
+						break;
+					case (1):
+						open_door();
+						break;
+					case (2):
+						stop_door();
+						break;
+					case (3):
+						close_door();
+						break;
+				}
 			}
 		}
 	}
 	last_button_state_signal = reading_signal_button;
-	Serial.println(current_value());
+	//Serial.println(current_value());
 	stop_door();
 }
 
 uint8_t open_door()
 {
-	analogWrite(motor_pin_1, 255);
-	analogWrite(motor_pin_2, 0);
-	if ((digitalRead(endswitch_1) == LOW) || (digitalRead(endswitch_2) == LOW)) {
-		stop_door();
+	while (current_value() != 0 && current_value() != 512){
+		analogWrite(motor_pin_1, 255);
+		analogWrite(motor_pin_2, 0);
+		if ((digitalRead(endswitch_1) == LOW) || (digitalRead(endswitch_2) == LOW)) {
+			stop_door();
+			break;
+		}
+		if (digitalRead(door_signal == HIGH)) {
+			stop_door();
+			break;
+		}
+		if (digitalRead(signal_button) == LOW) {
+			stop_door();
+			break;
+		}
 	}
-	if (digitalRead(door_signal == HIGH)) {
-		stop_door();
-	}
-
+	status += 1;
+	if (status == 3) status =0;
+	return status;
 }
+
+uint8_t close_door()
+{
+	while (current_value() != 0 && current_value() != 512){
+		analogWrite(motor_pin_1, 0);
+		analogWrite(motor_pin_2, 255);
+		if ((digitalRead(endswitch_1) == LOW) || (digitalRead(endswitch_2) == LOW)) {
+			stop_door();
+			break;
+		}
+		if (digitalRead(door_signal == HIGH)) {
+			stop_door();
+			break;
+		}
+		if (digitalRead(signal_button) == LOW) {
+			stop_door();
+			break;
+		}
+	}
+	status += 1;
+	if (status == 3) status =0;
+	return status;
+}
+
+
 void force_open_door()
 {
 	//Serial.println("opening door");
@@ -108,6 +160,8 @@ int current_value()
 {
 	int value;
 	value = analogRead(current_sensor);
-	//value = map(value, 0, 1023, -512, 511);
+	value = map(value, 0, 1023, -512, 511);
+	if (value < 20 || value > -20 ) return 0;
+	if (value > 150 || value < -150) return 512;
 	return value;
 }
