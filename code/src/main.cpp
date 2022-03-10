@@ -21,17 +21,15 @@ const int current_sensor = A3;
 //Different States in which this control unit can be in
 enum state{
 	boot,
-	stopped,
+	stop,
 	up,
 	down,
+	suspend,
 };
 
-state current = stopped;
-state last = boot;
+state command = stop;
+state last_command = boot;
 
-//Function Prototypes
-uint8_t automatic_button();
-int current_value();
 
 void setup()
 {
@@ -68,81 +66,79 @@ void setup()
 
 void loop()
 {
-	if (automatic_button() == 1)  {
-		state tmp = current;
-		if (current == stopped) {
-			Serial.println("button -> starting");
-			if (last == boot) {
-				current = down;
-			}
-			if (last == up) {
-				current = down;
-			}
-			if (last == down) {
-				current = up;
-			}
-			last = tmp;
-		}
-		else {
-		//if (current != stopped) {
-			Serial.println("button -> stopping");
-			last = current;
-			current = stopped;
-		}
-	}
-
-	if (current == up) {
-#if Serial_Debug
-		//Serial.println("Öffnen");
-#endif
-		analogWrite(motor_pin_1, 255);
-		analogWrite(motor_pin_2, 0);
-	}
-	if (current == down) {
-#if Serial_Debug
-		//Serial.println("Schließen");
-#endif
-		analogWrite(motor_pin_1, 0);
-		analogWrite(motor_pin_2, 255);
-	}
-	if (current == stopped) {
-		analogWrite(motor_pin_1, 0);
-		analogWrite(motor_pin_2, 0);
-	}
-
 #if Endswitch
-	if (((digitalRead(endswitch_1) == HIGH) || (digitalRead(endswitch_2) == HIGH)) && current != stopped) {
-		last = current;
-		current = stopped;
+	if (((digitalRead(endswitch_1) == HIGH) || (digitalRead(endswitch_2) == HIGH)) && command != stop) {
+		last_command = command;
+		command = stop;
 		Serial.println("Endschalter Ausgelöst");
 	}
 #endif
 
 #if ZeroCurrent
-	if (current_value() == 0 && current != stopped) {
+	if (current_value() == 0 && command != stop) {
 		Serial.println("Endposition erreicht");
-		last = current;
-		current = stopped;
+		last_command = command;
+		command = stop;
 	}
 #endif
 
 #if OverCurrent
-	if (current_value() == 512 && current != stopped) {
-		last = current;
-		current = stopped;
+	if (current_value() == 512 && command != stop) {
+		last_command = command;
+		command = stop;
 		Serial.println("Zu viel Strom, abschalten");
 	}
 #endif
+	if (automatic_button() == 1)  {
+		state tmp = command;
+		if (command == stop) {
+			Serial.println("button -> starting");
+			if (last_command == boot) {
+				command = down;
+			}
+			if (last_command == up) {
+				command = down;
+			}
+			if (last_command == down) {
+				command = up;
+			}
+			last_command = tmp;
+		}
+		else {
+			Serial.println("button -> stopping");
+			last_command = command;
+			command = stop;
+		}
+	}
+
+
 
 	// Force Close or Open, only reachable with Buttons on PCB
-	while (digitalRead(close_button) == LOW && current == stopped) {
-		analogWrite(motor_pin_1, 0);
-		analogWrite(motor_pin_2, 255);
+	if (digitalRead(close_button) == LOW && command == stop) {
+		last_command = command;
+		command = down;
 	}
-	while (digitalRead(open_button) == LOW && current == stopped) {
-		analogWrite(motor_pin_1, 255);
-		analogWrite(motor_pin_2, 0);
+	if (digitalRead(open_button) == LOW && command == stop) {
+		last_command = command;
+		command = up;
 	}
+
+	if (command == up) {
+		motor_start_up();
+	}
+
+	if (command == down) {
+		motor_start_down();
+	}
+
+	if (command == stop) {
+		motor_stop();
+		//command = suspend;
+	}
+	if (command == suspend) {
+		motor_suspend();
+	}
+
 }
 unsigned long last_Debounce_time;
 unsigned long debounce_delay = 100;
@@ -169,9 +165,29 @@ uint8_t automatic_button()
 	return 0;
 }
 
+void motor_start_down()
+{
+	analogWrite(motor_pin_1, 0);
+	analogWrite(motor_pin_2, 255);
+}
 
+void motor_start_up()
+{
+	analogWrite(motor_pin_1, 255);
+	analogWrite(motor_pin_2, 0);
+}
 
-//Returns Current needed from Motor
+void motor_stop(){
+	analogWrite(motor_pin_1, 0);
+	analogWrite(motor_pin_2, 0);
+}
+
+void motor_suspend()
+{
+
+}
+
+//Returns command needed from Motor
 //If Motor is in one End-Position he cant drive further in that so an external
 //Switch turns that motor in that direction of, This will return an 0 and is
 //interpreted that the Motor has reached its endposition.
