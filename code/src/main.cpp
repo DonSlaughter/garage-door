@@ -18,13 +18,7 @@ const int endswitch_1 = A1;
 const int endswitch_2 = A2;
 const int current_sensor = A3;
 
-const int debounce_delay = 100;
-
-int last_steady_state = LOW;
-int last_flickerabele_state = LOW;
-int current_state;
-unsigned long last_debounce_time = 0;
-
+//Different States in which this control unit can be in
 enum state{
 	boot,
 	stopped,
@@ -36,7 +30,7 @@ state current = stopped;
 state last = boot;
 
 //Function Prototypes
-uint8_t board_signal();
+uint8_t automatic_button();
 int current_value();
 
 void setup()
@@ -63,7 +57,7 @@ void setup()
 	Serial.println(digitalRead(open_button));
 	Serial.print("signal_button : ");
 	Serial.println(digitalRead(signal_button));
-	Serial.print("Tür board_signal : ");
+	Serial.print("Tür automatic_button : ");
 	Serial.println(digitalRead(door_signal));
 	Serial.print("Endschalter : ");
 	Serial.print(digitalRead(endswitch_1));
@@ -74,34 +68,40 @@ void setup()
 
 void loop()
 {
-	if (board_signal() == 1 && current == stopped) {
+	if (automatic_button() == 1)  {
 		state tmp = current;
+		if (current == stopped) {
+			Serial.println("button -> starting");
 			if (last == boot) {
-				//Serial.println("Now down");
 				current = down;
 			}
 			if (last == up) {
-				//Serial.println("Now down");
 				current = down;
 			}
 			if (last == down) {
-				//Serial.println("Now up");
 				current = up;
 			}
 			last = tmp;
-	}
-	if (board_signal() == 1 && current != stopped) {
+		}
+		else {
+		//if (current != stopped) {
+			Serial.println("button -> stopping");
 			last = current;
 			current = stopped;
+		}
 	}
 
 	if (current == up) {
+#if Serial_Debug
 		//Serial.println("Öffnen");
+#endif
 		analogWrite(motor_pin_1, 255);
 		analogWrite(motor_pin_2, 0);
 	}
 	if (current == down) {
+#if Serial_Debug
 		//Serial.println("Schließen");
+#endif
 		analogWrite(motor_pin_1, 0);
 		analogWrite(motor_pin_2, 255);
 	}
@@ -120,6 +120,7 @@ void loop()
 
 #if ZeroCurrent
 	if (current_value() == 0 && current != stopped) {
+		Serial.println("Endposition erreicht");
 		last = current;
 		current = stopped;
 	}
@@ -132,6 +133,8 @@ void loop()
 		Serial.println("Zu viel Strom, abschalten");
 	}
 #endif
+
+	// Force Close or Open, only reachable with Buttons on PCB
 	while (digitalRead(close_button) == LOW && current == stopped) {
 		analogWrite(motor_pin_1, 0);
 		analogWrite(motor_pin_2, 255);
@@ -141,23 +144,37 @@ void loop()
 		analogWrite(motor_pin_2, 0);
 	}
 }
+unsigned long last_Debounce_time;
+unsigned long debounce_delay = 100;
+int button_state;
+int last_button_state = HIGH;
 
-uint8_t board_signal()
+uint8_t automatic_button()
 {
-	//Serial.println("kopf");
-	uint8_t switch_signal;
-	current_state = digitalRead(signal_button);
-	if (current_state != last_flickerabele_state) {
-		last_debounce_time = millis();
-		last_flickerabele_state = current_state;
+	int current_button_state = digitalRead(signal_button);
+
+	if (current_button_state != last_button_state) {
+		last_Debounce_time = millis();
 	}
-	if (last_steady_state == HIGH && current_state ==LOW) switch_signal = 1;
-	else if (last_steady_state == LOW && current_state == HIGH) switch_signal = 0;
-	else switch_signal =0;
-	last_steady_state = current_state;
-	return switch_signal;
+
+	if ((millis() - last_Debounce_time) > debounce_delay) {
+		if (current_button_state != button_state) {
+			button_state = current_button_state;
+			if (button_state == LOW){
+				return 1;
+			}
+		}
+	}
+	last_button_state = current_button_state;
+	return 0;
 }
 
+
+
+//Returns Current needed from Motor
+//If Motor is in one End-Position he cant drive further in that so an external
+//Switch turns that motor in that direction of, This will return an 0 and is
+//interpreted that the Motor has reached its endposition.
 int current_value()
 {
 	int value = 0;
