@@ -30,6 +30,10 @@ enum state{
 state command = stop;
 state last_command = boot;
 
+//Class for Automatic Button on PCB an Exteral Door signal (key or switch in
+//Garage)
+auto_switch pcb_button(signal_button, LOW);
+auto_switch door_button(door_signal, HIGH);
 
 void setup()
 {
@@ -89,7 +93,7 @@ void loop()
 		Serial.println("Zu viel Strom, abschalten");
 	}
 #endif
-	if (automatic_button() == 1)  {
+	if ((pcb_button.pressed() == 1 ) || door_button.pressed() ==1 )  {
 		state tmp = command;
 		if (command == stop) {
 			Serial.println("button -> starting");
@@ -112,8 +116,6 @@ void loop()
 	}
 
 
-
-	// Force Close or Open, only reachable with Buttons on PCB
 	if (digitalRead(close_button) == LOW && command == stop) {
 		last_command = command;
 		command = down;
@@ -133,37 +135,12 @@ void loop()
 
 	if (command == stop) {
 		motor_stop();
-		//command = suspend;
 	}
 	if (command == suspend) {
 		motor_suspend();
 	}
-
 }
-unsigned long last_Debounce_time;
-unsigned long debounce_delay = 100;
-int button_state;
-int last_button_state = HIGH;
 
-uint8_t automatic_button()
-{
-	int current_button_state = digitalRead(signal_button);
-
-	if (current_button_state != last_button_state) {
-		last_Debounce_time = millis();
-	}
-
-	if ((millis() - last_Debounce_time) > debounce_delay) {
-		if (current_button_state != button_state) {
-			button_state = current_button_state;
-			if (button_state == LOW){
-				return 1;
-			}
-		}
-	}
-	last_button_state = current_button_state;
-	return 0;
-}
 
 void motor_start_down()
 {
@@ -177,11 +154,13 @@ void motor_start_up()
 	analogWrite(motor_pin_2, 0);
 }
 
-void motor_stop(){
+void motor_stop()
+{
 	analogWrite(motor_pin_1, 0);
 	analogWrite(motor_pin_2, 0);
 }
 
+//TODO write nothing to Motor Pins
 void motor_suspend()
 {
 
