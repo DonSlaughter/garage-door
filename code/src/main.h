@@ -10,6 +10,7 @@ class auto_switch
 {
 	public:
 		auto_switch(int pin, int on_status);
+		void setup();
 		void loop(unsigned long millis);
 		uint8_t event;
 		enum Event {
@@ -39,6 +40,10 @@ auto_switch::auto_switch(int pin, int on_status)
 
 	_pin = pin;
 	_on_status = on_status;
+}
+
+void auto_switch::setup() {
+	pinMode(_pin, INPUT);
 }
 
 void auto_switch::loop(unsigned long millis)

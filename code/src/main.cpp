@@ -35,18 +35,29 @@ state last_command = boot;
 auto_switch pcb_button(signal_button, LOW);
 auto_switch door_button(door_signal, HIGH);
 
+auto_switch* switches[3] = {
+	&pcb_button,
+	&door_button,
+	0
+};
+
 void setup()
 {
 #if Serial_Debug
 	Serial.begin(9600);
 #endif
+
+	for (int i = 0; auto_switch *sw = switches[i]; i++) {
+		sw->setup();
+	}
+
 	pinMode(ext_LED, OUTPUT);
 	pinMode(close_button, INPUT_PULLUP);
 	pinMode(open_button, INPUT_PULLUP);
-	pinMode(signal_button, INPUT_PULLUP);
+	// pinMode(signal_button, INPUT_PULLUP);
 	pinMode(motor_pin_1, OUTPUT);
 	pinMode(motor_pin_2, OUTPUT);
-	pinMode(door_signal, INPUT);
+	// pinMode(door_signal, INPUT);
 	pinMode(endswitch_1, INPUT_PULLUP);
 	pinMode(endswitch_2, INPUT_PULLUP);
 	pinMode(current_sensor, INPUT);
@@ -71,8 +82,10 @@ void setup()
 void loop()
 {
 	unsigned long current_millis = millis();
-	pcb_button.loop(current_millis);
-	door_button.loop(current_millis);
+
+	for (int i = 0; auto_switch *sw = switches[i]; i++) {
+		sw->loop(current_millis);
+	}
 
 #if Endswitch
 	if (((digitalRead(endswitch_1) == HIGH) || (digitalRead(endswitch_2) == HIGH)) && command != stop) {
