@@ -13,7 +13,7 @@ class auto_switch
 		uint8_t pressed();
 	private:
 		unsigned long last_Debounce_time;
-		unsigned long debounce_delay = 100;
+		unsigned long debounce_delay;
 		int current_button_state;
 		int button_state;
 		int last_button_state;
@@ -23,6 +23,11 @@ class auto_switch
 
 auto_switch::auto_switch(int pin, int on_status)
 {
+	last_Debounce_time = 0;
+	debounce_delay = 100;
+	current_button_state = 0;
+	button_state = 0;
+	last_button_state = 0;
 	_pin = pin;
 	_on_status = on_status;
 }
