@@ -10,7 +10,13 @@ class auto_switch
 {
 	public:
 		auto_switch(int pin, int on_status);
-		uint8_t pressed();
+		void loop(unsigned long millis);
+		uint8_t event;
+		enum Event {
+			None,
+			Pressed,
+			Released
+		};
 	private:
 		unsigned long last_Debounce_time;
 		unsigned long debounce_delay;
@@ -23,31 +29,37 @@ class auto_switch
 
 auto_switch::auto_switch(int pin, int on_status)
 {
+	event = auto_switch::Event::None;
+
 	last_Debounce_time = 0;
 	debounce_delay = 100;
 	current_button_state = 0;
 	button_state = 0;
 	last_button_state = 0;
+
 	_pin = pin;
 	_on_status = on_status;
 }
 
-uint8_t auto_switch::pressed()
+void auto_switch::loop(unsigned long millis)
 {
+	event = auto_switch::Event::None;
+
 	current_button_state = digitalRead(_pin);
 
 	if (current_button_state != last_button_state) {
-		last_Debounce_time = millis();
+		last_Debounce_time = millis;
 	}
 
-	if ((millis() - last_Debounce_time) > debounce_delay) {
+	if ((millis - last_Debounce_time) > debounce_delay) {
 		if (current_button_state != button_state) {
 			button_state = current_button_state;
 			if (button_state == _on_status) {
-				return 1;
+				event = auto_switch::Event::Pressed;
+			} else {
+				event = auto_switch::Event::Released;
 			}
 		}
 	}
 	last_button_state = current_button_state;
-	return 0;
 }

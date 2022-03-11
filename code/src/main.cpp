@@ -70,6 +70,10 @@ void setup()
 
 void loop()
 {
+	unsigned long current_millis = millis();
+	pcb_button.loop(current_millis);
+	door_button.loop(current_millis);
+
 #if Endswitch
 	if (((digitalRead(endswitch_1) == HIGH) || (digitalRead(endswitch_2) == HIGH)) && command != stop) {
 		last_command = command;
@@ -93,7 +97,7 @@ void loop()
 		Serial.println("Zu viel Strom, abschalten");
 	}
 #endif
-	if ((pcb_button.pressed() == 1 ) || door_button.pressed() ==1 )  {
+	if ( (pcb_button.event == auto_switch::Event::Pressed ) || (door_button.event == auto_switch::Event::Pressed) )  {
 		state tmp = command;
 		if (command == stop) {
 			Serial.println("button -> starting");
