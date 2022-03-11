@@ -150,8 +150,8 @@ void motor_start_down()
 
 void motor_start_up()
 {
-	analogWrite(motor_pin_1, 255);
 	analogWrite(motor_pin_2, 0);
+	analogWrite(motor_pin_1, 255);
 }
 
 void motor_stop()
