@@ -40,6 +40,8 @@ button pcb_button(signal_button, LOW, 100);
 button door_button(door_signal, HIGH, 100);
 button security_button_1(endswitch_1, HIGH, 1);
 button security_button_2(endswitch_2, HIGH, 1);
+button manual_down_button(close_button, LOW, 1);
+button manual_up_button(open_button, LOW, 1);
 
 motor motor(motor_pin_1, motor_pin_2);
 
@@ -70,6 +72,8 @@ void loop()
 	door_button.loop(current_millis);
 	security_button_1.loop(current_millis);
 	security_button_2.loop(current_millis);
+	manual_down_button.loop(current_millis);
+	manual_up_button.loop(current_millis);
 
 	//Security Switches to detect an obstacle. Switches open if Motor runs into obstacle
 	if (((security_button_1.event == button::Event::Pressed) ||
@@ -123,13 +127,17 @@ void loop()
 		}
 	}
 
-	if (digitalRead(close_button) == LOW && command == stop) {
-		last_command = command;
-		command = down;
+	if ((manual_down_button.event == button::Event::Pressed) && (command == stop)){
+		command = manual_down;
 	}
-	if (digitalRead(open_button) == LOW && command == stop) {
-		last_command = command;
-		command = up;
+	if ((manual_down_button.event == button::Event::Released) && (command == manual_down)){
+		command = stop;
+	}
+	if ((manual_up_button.event == button::Event::Pressed) && (command == stop)) {
+		command = manual_up;
+	}
+	if ((manual_up_button.event == button::Event::Released) && (command == manual_up)){
+		command = stop;
 	}
 
 	if (command == up) {
@@ -142,6 +150,12 @@ void loop()
 
 	if (command == stop) {
 		motor.motor_stop();
+	}
+	if (command == manual_down) {
+		motor.motor_down();
+	}
+	if (command == manual_up) {
+		motor.motor_up();
 	}
 	//TODO
 	if (command == suspend) {
