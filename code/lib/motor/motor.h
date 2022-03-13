@@ -14,9 +14,7 @@ class motor
 			suspend,
 		};
 		void motor_down();
-		void motor_down(unsigned long time);
 		void motor_up();
-		void motor_up(unsigned long time);
 		void motor_stop();
 		void motor_suspend();
 private:

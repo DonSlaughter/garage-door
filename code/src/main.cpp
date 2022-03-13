@@ -27,8 +27,6 @@ enum state{
 	up, 				//Up State -> Motor opens door
 	down, 				//Down State -> Motor closes door
 	suspend, 			//Suspend State -> Motor Pins write nothing
-	emergency_up, 		//emergency_up -> motor goes 1 second up
-	emergency_down, 	//emergency_down -> motor goes 1 second down
 	manual_up, 			//manual_up -> motor opens while button ob PCB is pressed, without security
 	manual_down, 		//manual_down -> motor closes while button on PCB is pressed, without security
 };
@@ -76,12 +74,34 @@ void loop()
 	manual_up_button.loop(current_millis);
 
 	//Security Switches to detect an obstacle. Switches open if Motor runs into obstacle
-	if (((security_button_1.event == button::Event::Pressed) ||
-			(security_button_2.event == button::Event::Pressed))
-			&& ((command == down) || (command == up))){
-		last_command = command;
+	//Security Button 1 = up switch
+	//Security Button 2 = down switch
+	if (security_button_1.event == button::Event::Pressed) {
+		Serial.println("Endschalter Ausgelöst 1");
+		if (command == up) {
+			Serial.println("Beim Auf-Fahren : Hinderniss erkannt, umdrehen");
+			last_command = command;
+			command = down;
+		}
+	}
+	if (security_button_2.event == button::Event::Pressed) {
+		Serial.println("Endschalter Ausgelöst 2");
+		if (command == down) {
+			Serial.println("Beim Zu-Fahren : Hinderniss erkannt, umdrehen");
+			last_command = command;
+			command = up;
+		}
+	}
+	if ((security_button_1.event == button::Event::Released) ||
+			(security_button_2.event == button::Event::Released)){
+			if (command == up) {
+			last_command = down;
+			}
+			if (command == down) {
+				last_command = up;
+			}
 		command = stop;
-		Serial.println("Endschalter Ausgelöst");
+		Serial.println("Endschalter frei");
 	}
 
 	//Motor Currents reads ~0 Ampere if Motor is cut of within its enpositons,
