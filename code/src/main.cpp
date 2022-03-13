@@ -27,6 +27,8 @@ enum state{
 	up,
 	down,
 	suspend,
+	emergency_up,
+	emergency_down,
 };
 
 state command = stop;
@@ -34,6 +36,8 @@ state last_command = boot;
 
 button pcb_button(signal_button, LOW);
 button door_button(door_signal, HIGH);
+button security_button_1(endswitch_1, HIGH);
+button security_button_2(endswitch_2, HIGH);
 
 motor motor(motor_pin_1, motor_pin_2);
 
@@ -61,9 +65,14 @@ void loop()
 	unsigned long current_millis = millis();
 	pcb_button.loop(current_millis);
 	door_button.loop(current_millis);
+	security_button_1.loop(current_millis);
+	security_button_2.loop(current_millis);
+
 
 #if Endswitch
-	if (((digitalRead(endswitch_1) == HIGH) || (digitalRead(endswitch_2) == HIGH)) && command != stop) {
+	if (((security_button_1.event == button::Event::Pressed) ||
+			(security_button_2.event == button::Event::Pressed))
+			&& command != stop) {
 		last_command = command;
 		command = stop;
 		Serial.println("Endschalter Ausgelöst");
@@ -128,6 +137,7 @@ void loop()
 	if (command == stop) {
 		motor.motor_stop();
 	}
+	//TODO
 	if (command == suspend) {
 		motor.motor_suspend();
 	}
