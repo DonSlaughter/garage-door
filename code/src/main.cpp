@@ -29,6 +29,8 @@ enum state{
 	suspend,
 	emergency_up,
 	emergency_down,
+	manual_up,
+	manual_down,
 };
 
 state command = stop;
@@ -62,31 +64,35 @@ void setup()
 
 void loop()
 {
+	//Button loop
 	unsigned long current_millis = millis();
 	pcb_button.loop(current_millis);
 	door_button.loop(current_millis);
 	security_button_1.loop(current_millis);
 	security_button_2.loop(current_millis);
 
-
-#if Endswitch
+	//Security Switches to detect an obstacle. Switches open if Motor runs into obstacle
 	if (((security_button_1.event == button::Event::Pressed) ||
 			(security_button_2.event == button::Event::Pressed))
-			&& command != stop) {
+			&& ((command == down) || (command == up))){
 		last_command = command;
 		command = stop;
 		Serial.println("Endschalter Ausgelöst");
 	}
-#endif
 
-#if ZeroCurrent
+	//Motor Currents reads ~0 Ampere if Motor is cut of within its enpositons,
+	//Hardeware switch turns Motor of and it is detected with an reading around
+	//0 from current_value()
 	if (current_value() == 0 && command != stop) {
 		Serial.println("Endposition erreicht");
 		last_command = command;
 		command = stop;
 	}
-#endif
 
+	//OverCurrent protection. This Function detects an obstacle that wont get
+	//detectet with the Security Switches but the motor will drain to much
+	//Current. Will get implemented if Door is connected to Motor to determain
+	//the correct vale to turn off
 #if OverCurrent
 	if (current_value() == 512 && command != stop) {
 		last_command = command;
@@ -94,6 +100,7 @@ void loop()
 		Serial.println("Zu viel Strom, abschalten");
 	}
 #endif
+
 	if ( (pcb_button.event == button::Event::Pressed ) || (door_button.event == button::Event::Pressed) )  {
 		state tmp = command;
 		if (command == stop) {
@@ -115,7 +122,6 @@ void loop()
 			command = stop;
 		}
 	}
-
 
 	if (digitalRead(close_button) == LOW && command == stop) {
 		last_command = command;
