@@ -1,4 +1,6 @@
 #include <Arduino.h>
+#include "motor.h"
+#include "button.h"
 #include "main.h"
 
 #define Endswitch 1
@@ -30,10 +32,10 @@ enum state{
 state command = stop;
 state last_command = boot;
 
-//Class for Automatic Button on PCB an Exteral Door signal (key or switch in
-//Garage)
-auto_switch pcb_button(signal_button, LOW);
-auto_switch door_button(door_signal, HIGH);
+button pcb_button(signal_button, LOW);
+button door_button(door_signal, HIGH);
+
+motor motor(motor_pin_1, motor_pin_2);
 
 void setup()
 {
@@ -52,20 +54,6 @@ void setup()
 	pinMode(current_sensor, INPUT);
 
 	delay(100);
-#if Serial_Debug
-	Serial.print("Close button : ");
-	Serial.println(digitalRead(close_button));
-	Serial.print("open button : ");
-	Serial.println(digitalRead(open_button));
-	Serial.print("signal_button : ");
-	Serial.println(digitalRead(signal_button));
-	Serial.print("Tür automatic_button : ");
-	Serial.println(digitalRead(door_signal));
-	Serial.print("Endschalter : ");
-	Serial.print(digitalRead(endswitch_1));
-	Serial.print("   ");
-	Serial.println(digitalRead(endswitch_2));
-#endif
 }
 
 void loop()
@@ -97,7 +85,7 @@ void loop()
 		Serial.println("Zu viel Strom, abschalten");
 	}
 #endif
-	if ( (pcb_button.event == auto_switch::Event::Pressed ) || (door_button.event == auto_switch::Event::Pressed) )  {
+	if ( (pcb_button.event == button::Event::Pressed ) || (door_button.event == button::Event::Pressed) )  {
 		state tmp = command;
 		if (command == stop) {
 			Serial.println("button -> starting");
@@ -130,44 +118,19 @@ void loop()
 	}
 
 	if (command == up) {
-		motor_start_up();
+		motor.motor_up();
 	}
 
 	if (command == down) {
-		motor_start_down();
+		motor.motor_down();
 	}
 
 	if (command == stop) {
-		motor_stop();
+		motor.motor_stop();
 	}
 	if (command == suspend) {
-		motor_suspend();
+		motor.motor_suspend();
 	}
-}
-
-
-void motor_start_down()
-{
-	analogWrite(motor_pin_1, 0);
-	analogWrite(motor_pin_2, 255);
-}
-
-void motor_start_up()
-{
-	analogWrite(motor_pin_2, 0);
-	analogWrite(motor_pin_1, 255);
-}
-
-void motor_stop()
-{
-	analogWrite(motor_pin_1, 0);
-	analogWrite(motor_pin_2, 0);
-}
-
-//TODO write nothing to Motor Pins
-void motor_suspend()
-{
-
 }
 
 //Returns command needed from Motor
