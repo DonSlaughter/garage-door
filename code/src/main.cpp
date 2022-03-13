@@ -36,10 +36,10 @@ enum state{
 state command = stop;
 state last_command = boot;
 
-button pcb_button(signal_button, LOW);
-button door_button(door_signal, HIGH);
-button security_button_1(endswitch_1, HIGH);
-button security_button_2(endswitch_2, HIGH);
+button pcb_button(signal_button, LOW, 100);
+button door_button(door_signal, HIGH, 100);
+button security_button_1(endswitch_1, HIGH, 1);
+button security_button_2(endswitch_2, HIGH, 1);
 
 motor motor(motor_pin_1, motor_pin_2);
 

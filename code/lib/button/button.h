@@ -4,7 +4,7 @@
 class button
 {
 	public:
-		button(int pin, int on_status);
+		button(int pin, int on_status, unsigned long debounce_delay);
 		void loop(unsigned long millis);
 		uint8_t event;
 		enum Event {
@@ -14,7 +14,7 @@ class button
 		};
 	private:
 		unsigned long last_Debounce_time;
-		unsigned long debounce_delay;
+		unsigned long _debounce_delay;
 		int current_button_state;
 		int button_state;
 		int last_button_state;

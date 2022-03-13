@@ -1,16 +1,16 @@
 #include <Arduino.h>
 #include "button.h"
 
-button::button(int pin, int on_status)
+button::button(int pin, int on_status, unsigned long debounce_delay)
 {
 	event = button::Event::None;
 
 	last_Debounce_time = 0;
-	debounce_delay = 100;
 	current_button_state = 0;
 	button_state = 0;
 	last_button_state = 0;
 
+	_debounce_delay = debounce_delay;
 	_pin = pin;
 	_on_status = on_status;
 }
@@ -25,7 +25,7 @@ void button::loop(unsigned long millis)
 		last_Debounce_time = millis;
 	}
 
-	if ((millis - last_Debounce_time) > debounce_delay) {
+	if ((millis - last_Debounce_time) > _debounce_delay) {
 		if (current_button_state != button_state) {
 			button_state = current_button_state;
 			if (button_state == _on_status) {
