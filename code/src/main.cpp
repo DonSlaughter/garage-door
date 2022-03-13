@@ -22,15 +22,15 @@ const int current_sensor = A3;
 
 //Different States in which this control unit can be in
 enum state{
-	boot,
-	stop,
-	up,
-	down,
-	suspend,
-	emergency_up,
-	emergency_down,
-	manual_up,
-	manual_down,
+	boot, 				//Boot State does nothing
+	stop, 				//Stop State -> MotorPins write both 0
+	up, 				//Up State -> Motor opens door
+	down, 				//Down State -> Motor closes door
+	suspend, 			//Suspend State -> Motor Pins write nothing
+	emergency_up, 		//emergency_up -> motor goes 1 second up
+	emergency_down, 	//emergency_down -> motor goes 1 second down
+	manual_up, 			//manual_up -> motor opens while button ob PCB is pressed, without security
+	manual_down, 		//manual_down -> motor closes while button on PCB is pressed, without security
 };
 
 state command = stop;
