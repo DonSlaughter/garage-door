@@ -12,6 +12,7 @@
 //LED's
 #define NUM_LEDS 40
 CRGB leds[NUM_LEDS];
+#define COLOR_ORDER GBR
 // Pin Declaration
 const int ext_LED = 4;
 const int close_button = 5;
@@ -64,7 +65,7 @@ void setup()
 	pinMode(current_sensor, INPUT);
 	motor.motor_stop();
 
-	FastLED.addLeds<WS2812, ext_LED>(leds, NUM_LEDS);
+	FastLED.addLeds<WS2812B, ext_LED, COLOR_ORDER>(leds, NUM_LEDS);
 
 	delay(100);
 }
@@ -114,7 +115,7 @@ void loop()
 	//Motor Currents reads ~0 Ampere if Motor is cut of within its enpositons,
 	//Hardeware switch turns Motor of and it is detected with an reading around
 	//0 from current_value()
-	if (current_value() == 0 && command != stop) {
+	if (current_value() == 0 && ((command == up) || (command == down))) {
 		Serial.println("Endposition erreicht");
 		last_command = command;
 		command = stop;
@@ -134,7 +135,7 @@ void loop()
 
 	if ( (pcb_button.event == button::Event::Pressed ) || (door_button.event == button::Event::Pressed) )  {
 		state tmp = command;
-		if ((command == stop) || (command == suspend)) {
+		if (command == suspend) {
 			Serial.println("button -> starting");
 			if (last_command == boot) {
 				command = down;
@@ -154,13 +155,13 @@ void loop()
 		}
 	}
 
-	if ((manual_down_button.event == button::Event::Pressed) && (command == stop)){
+	if ((manual_down_button.event == button::Event::Pressed) && (command == suspend)){
 		command = manual_down;
 	}
 	if ((manual_down_button.event == button::Event::Released) && (command == manual_down)){
 		command = stop;
 	}
-	if ((manual_up_button.event == button::Event::Pressed) && (command == stop)) {
+	if ((manual_up_button.event == button::Event::Pressed) && (command == suspend)) {
 		command = manual_up;
 	}
 	if ((manual_up_button.event == button::Event::Released) && (command == manual_up)){
@@ -169,15 +170,20 @@ void loop()
 
 	if (command == up) {
 		motor.motor_up();
-		fill_solid(leds, NUM_LEDS, CRGB::Orange);
+		fill_solid(leds, NUM_LEDS, CRGB::Red);
+		FastLED.show();
 	}
 
 	if (command == down) {
 		motor.motor_down();
+		fill_solid(leds, NUM_LEDS, CRGB::Red);
+		FastLED.show();
 	}
 
 	if (command == stop) {
 		motor.motor_stop();
+		fill_solid(leds, NUM_LEDS, CRGB::Green);
+		FastLED.show();
 		command = suspend;
 	}
 	if (command == manual_down) {
