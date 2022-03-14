@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <FastLED.h>
 #include "motor.h"
 #include "button.h"
 #include "main.h"
@@ -8,6 +9,9 @@
 #define ZeroCurrent 1
 #define Serial_Debug 1
 
+//LED's
+#define NUM_LEDS 40
+CRGB leds[NUM_LEDS];
 // Pin Declaration
 const int ext_LED = 4;
 const int close_button = 5;
@@ -58,6 +62,9 @@ void setup()
 	pinMode(endswitch_1, INPUT_PULLUP);
 	pinMode(endswitch_2, INPUT_PULLUP);
 	pinMode(current_sensor, INPUT);
+	motor.motor_stop();
+
+	FastLED.addLeds<WS2812, ext_LED>(leds, NUM_LEDS);
 
 	delay(100);
 }
@@ -127,7 +134,7 @@ void loop()
 
 	if ( (pcb_button.event == button::Event::Pressed ) || (door_button.event == button::Event::Pressed) )  {
 		state tmp = command;
-		if (command == stop) {
+		if ((command == stop) || (command == suspend)) {
 			Serial.println("button -> starting");
 			if (last_command == boot) {
 				command = down;
@@ -162,6 +169,7 @@ void loop()
 
 	if (command == up) {
 		motor.motor_up();
+		fill_solid(leds, NUM_LEDS, CRGB::Orange);
 	}
 
 	if (command == down) {
@@ -170,6 +178,7 @@ void loop()
 
 	if (command == stop) {
 		motor.motor_stop();
+		command = suspend;
 	}
 	if (command == manual_down) {
 		motor.motor_down();
@@ -180,6 +189,7 @@ void loop()
 	//TODO
 	if (command == suspend) {
 		motor.motor_suspend();
+		Serial.println("suspend");
 	}
 }
 
