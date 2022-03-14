@@ -13,6 +13,7 @@
 #define NUM_LEDS 40
 CRGB leds[NUM_LEDS];
 #define COLOR_ORDER GBR
+int color;
 // Pin Declaration
 const int ext_LED = 4;
 const int close_button = 5;
@@ -34,6 +35,8 @@ enum state{
 	suspend, 			//Suspend State -> Motor Pins write nothing
 	manual_up, 			//manual_up -> motor opens while button ob PCB is pressed, without security
 	manual_down, 		//manual_down -> motor closes while button on PCB is pressed, without security
+	open_position, 		//Fully Open Position
+	closed_position, 	//Fully Closed Position
 };
 
 state command = stop;
@@ -81,9 +84,9 @@ void loop()
 	manual_down_button.loop(current_millis);
 	manual_up_button.loop(current_millis);
 
-	//Security Switches to detect an obstacle. Switches open if Motor runs into obstacle
-	//Security Button 1 = up switch
-	//Security Button 2 = down switch
+//Security Switches to detect an obstacle. Switches open if Motor runs into obstacle
+//Security Button 1 = up switch
+//Security Button 2 = down switch
 	if (security_button_1.event == button::Event::Pressed) {
 		Serial.println("Endschalter Ausgelöst 1");
 		if (command == up) {
@@ -112,19 +115,26 @@ void loop()
 		Serial.println("Endschalter frei");
 	}
 
-	//Motor Currents reads ~0 Ampere if Motor is cut of within its enpositons,
-	//Hardeware switch turns Motor of and it is detected with an reading around
-	//0 from current_value()
-	if (current_value() == 0 && ((command == up) || (command == down))) {
-		Serial.println("Endposition erreicht");
+//Motor Currents reads ~0 Ampere if Motor is cut of within its enpositons,
+//Hardeware switch turns Motor of and it is detected with an reading around
+//0 from current_value()
+	if (current_value() == 0) {
+		if (command == up) {
+			last_command = command;
+			command = open_position;
+		}
+		if (command == down) {
+			last_command = command;
+			command = closed_position;
+		}
 		last_command = command;
 		command = stop;
 	}
 
-	//OverCurrent protection. This Function detects an obstacle that wont get
-	//detectet with the Security Switches but the motor will drain to much
-	//Current. Will get implemented if Door is connected to Motor to determain
-	//the correct vale to turn off
+//OverCurrent protection. This Function detects an obstacle that wont get
+//detectet with the Security Switches but the motor will drain to much
+//Current. Will get implemented if Door is connected to Motor to determain
+//the correct vale to turn off
 #if OverCurrent
 	if (current_value() == 512 && command != stop) {
 		last_command = command;
@@ -148,6 +158,12 @@ void loop()
 			}
 			last_command = tmp;
 		}
+		if (command == open_position) {
+			command = down;
+		}
+		if (command == closed_position) {
+			command = up;
+		}
 		else {
 			Serial.println("button -> stopping");
 			last_command = command;
@@ -155,6 +171,8 @@ void loop()
 		}
 	}
 
+
+	// Manual Button Events
 	if ((manual_down_button.event == button::Event::Pressed) && (command == suspend)){
 		command = manual_down;
 	}
@@ -168,18 +186,17 @@ void loop()
 		command = stop;
 	}
 
+	// Command Events
 	if (command == up) {
 		motor.motor_up();
 		fill_solid(leds, NUM_LEDS, CRGB::Red);
 		FastLED.show();
 	}
-
 	if (command == down) {
 		motor.motor_down();
 		fill_solid(leds, NUM_LEDS, CRGB::Red);
 		FastLED.show();
 	}
-
 	if (command == stop) {
 		motor.motor_stop();
 		fill_solid(leds, NUM_LEDS, CRGB::Green);
@@ -192,10 +209,19 @@ void loop()
 	if (command == manual_up) {
 		motor.motor_up();
 	}
-	//TODO
 	if (command == suspend) {
 		motor.motor_suspend();
 		Serial.println("suspend");
+	}
+	if (command == open_position) {
+		//TODO
+		Serial.println("Tor Offen");
+		command = suspend;
+	}
+	if (command == closed_position) {
+		//TODO
+		Serial.println("Tor Geschlossen");
+		command = suspend;
 	}
 }
 
