@@ -4,16 +4,12 @@
 #include "button.h"
 #include "main.h"
 
-#define Endswitch 1
 #define OverCurrent 0
-#define ZeroCurrent 1
-#define Serial_Debug 1
 
 //LED's
 #define NUM_LEDS 40
 CRGB leds[NUM_LEDS];
-#define COLOR_ORDER GBR
-int color;
+#define COLOR_ORDER GRB
 // Pin Declaration
 const int ext_LED = 4;
 const int close_button = 5;
@@ -35,8 +31,8 @@ enum state{
 	suspend, 			//Suspend State -> Motor Pins write nothing
 	manual_up, 			//manual_up -> motor opens while button ob PCB is pressed, without security
 	manual_down, 		//manual_down -> motor closes while button on PCB is pressed, without security
-	open_position, 		//Fully Open Position
-	closed_position, 	//Fully Closed Position
+	open_position, 		//fully open position
+	closed_position, 	//fully closed position
 };
 
 state command = stop;
@@ -53,9 +49,7 @@ motor motor(motor_pin_1, motor_pin_2);
 
 void setup()
 {
-#if Serial_Debug
 	Serial.begin(9600);
-#endif
 	pinMode(ext_LED, OUTPUT);
 	pinMode(close_button, INPUT_PULLUP);
 	pinMode(open_button, INPUT_PULLUP);
@@ -66,7 +60,6 @@ void setup()
 	pinMode(endswitch_1, INPUT_PULLUP);
 	pinMode(endswitch_2, INPUT_PULLUP);
 	pinMode(current_sensor, INPUT);
-	motor.motor_stop();
 
 	FastLED.addLeds<WS2812B, ext_LED, COLOR_ORDER>(leds, NUM_LEDS);
 
@@ -115,20 +108,20 @@ void loop()
 		Serial.println("Endschalter frei");
 	}
 
-//Motor Currents reads ~0 Ampere if Motor is cut of within its enpositons,
-//Hardeware switch turns Motor of and it is detected with an reading around
-//0 from current_value()
+	//Motor Currents reads ~0 Ampere if Motor is cut of within its enpositons,
+	//Hardeware switch turns Motor of and it is detected with an reading around
+	//0 from current_value()
 	if (current_value() == 0) {
 		if (command == up) {
+			Serial.println("Tor Offen ");
 			last_command = command;
-			command = stop;
+			command = open_position;
 		}
-		if (command == down) {
+		if (command == down){
+			Serial.println("Tor Geschlossen");
 			last_command = command;
-			command = stop;
+			command = closed_position;
 		}
-		last_command = command;
-		command = stop;
 	}
 
 //OverCurrent protection. This Function detects an obstacle that wont get
@@ -158,12 +151,16 @@ void loop()
 			}
 			last_command = tmp;
 		}
-//		if (command == open_position) {
-//			command = down;
-//		}
-//		if (command == closed_position) {
-//			command = up;
-//		}
+		else if (command == open_position) {
+			Serial.println("button -> starting to close");
+			last_command = command;
+			command = down;
+		}
+		else if (command == closed_position) {
+			Serial.println("button -> starting to open");
+			last_command = command;
+			command = up;
+		}
 		else {
 			Serial.println("button -> stopping");
 			last_command = command;
@@ -211,19 +208,13 @@ void loop()
 	}
 	if (command == suspend) {
 		motor.motor_suspend();
-		//last_command = command;
-		Serial.println("suspend");
 	}
-//	if (command == open_position) {
-//		//TODO
-//		Serial.println("Tor Offen");
-//		command = suspend;
-//	}
-//	if (command == closed_position) {
-//		//TODO
-//		Serial.println("Tor Geschlossen");
-//		command = suspend;
-//	}
+	if (command == open_position) {
+		command = stop;
+	}
+	if (command == closed_position) {
+		command = stop;
+	}
 }
 
 //Returns command needed from Motor
