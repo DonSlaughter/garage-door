@@ -121,11 +121,11 @@ void loop()
 	if (current_value() == 0) {
 		if (command == up) {
 			last_command = command;
-			command = open_position;
+			command = stop;
 		}
 		if (command == down) {
 			last_command = command;
-			command = closed_position;
+			command = stop;
 		}
 		last_command = command;
 		command = stop;
@@ -158,12 +158,12 @@ void loop()
 			}
 			last_command = tmp;
 		}
-		if (command == open_position) {
-			command = down;
-		}
-		if (command == closed_position) {
-			command = up;
-		}
+//		if (command == open_position) {
+//			command = down;
+//		}
+//		if (command == closed_position) {
+//			command = up;
+//		}
 		else {
 			Serial.println("button -> stopping");
 			last_command = command;
@@ -211,18 +211,19 @@ void loop()
 	}
 	if (command == suspend) {
 		motor.motor_suspend();
+		//last_command = command;
 		Serial.println("suspend");
 	}
-	if (command == open_position) {
-		//TODO
-		Serial.println("Tor Offen");
-		command = suspend;
-	}
-	if (command == closed_position) {
-		//TODO
-		Serial.println("Tor Geschlossen");
-		command = suspend;
-	}
+//	if (command == open_position) {
+//		//TODO
+//		Serial.println("Tor Offen");
+//		command = suspend;
+//	}
+//	if (command == closed_position) {
+//		//TODO
+//		Serial.println("Tor Geschlossen");
+//		command = suspend;
+//	}
 }
 
 //Returns command needed from Motor
