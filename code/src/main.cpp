@@ -7,9 +7,12 @@
 #define OverCurrent 0
 
 //LED's
-#define NUM_LEDS 40
+#define NUM_LEDS 22
 CRGB leds[NUM_LEDS];
 #define COLOR_ORDER GRB
+
+CRGB color = CRGB::White;
+
 // Pin Declaration
 const int ext_LED = 4;
 const int close_button = 5;
@@ -84,6 +87,7 @@ void loop()
 		Serial.println("Endschalter Ausgelöst 1");
 		if (command == up) {
 			Serial.println("Beim Auf-Fahren : Hinderniss erkannt, umdrehen");
+			color = CRGB::Red;
 			last_command = command;
 			command = down;
 		}
@@ -91,6 +95,7 @@ void loop()
 	if (security_button_2.event == button::Event::Pressed) {
 		Serial.println("Endschalter Ausgelöst 2");
 		if (command == down) {
+			color = CRGB::Red;
 			Serial.println("Beim Zu-Fahren : Hinderniss erkannt, umdrehen");
 			last_command = command;
 			command = up;
@@ -99,10 +104,12 @@ void loop()
 	if ((security_button_1.event == button::Event::Released) ||
 			(security_button_2.event == button::Event::Released)){
 			if (command == up) {
-			last_command = down;
+				last_command = down;
+				color = CRGB::Red;
 			}
 			if (command == down) {
 				last_command = up;
+				color = CRGB::Red;
 			}
 		command = stop;
 		Serial.println("Endschalter frei");
@@ -114,11 +121,13 @@ void loop()
 	if (current_value() == 0) {
 		if (command == up) {
 			Serial.println("Tor Offen ");
+			color = CRGB::Green;
 			last_command = command;
 			command = open_position;
 		}
 		if (command == down){
 			Serial.println("Tor Geschlossen");
+			color = CRGB::Green;
 			last_command = command;
 			command = closed_position;
 		}
@@ -142,22 +151,27 @@ void loop()
 			Serial.println("button -> starting");
 			if (last_command == boot) {
 				command = down;
+				color = CRGB::Orange;
 			}
 			if (last_command == up) {
+				color = CRGB::Orange;
 				command = down;
 			}
 			if (last_command == down) {
+				color = CRGB::Orange;
 				command = up;
 			}
 			last_command = tmp;
 		}
 		else if (command == open_position) {
 			Serial.println("button -> starting to close");
+			color = CRGB::Orange;
 			last_command = command;
 			command = down;
 		}
 		else if (command == closed_position) {
 			Serial.println("button -> starting to open");
+			color = CRGB::Orange;
 			last_command = command;
 			command = up;
 		}
@@ -171,48 +185,60 @@ void loop()
 
 	// Manual Button Events
 	if ((manual_down_button.event == button::Event::Pressed) && (command == suspend)){
+		color = CRGB::Blue;
 		command = manual_down;
 	}
 	if ((manual_down_button.event == button::Event::Released) && (command == manual_down)){
+		color = CRGB::Green;
 		command = stop;
 	}
 	if ((manual_up_button.event == button::Event::Pressed) && (command == suspend)) {
+		color = CRGB::Blue;
 		command = manual_up;
 	}
 	if ((manual_up_button.event == button::Event::Released) && (command == manual_up)){
+		color = CRGB::Green;
 		command = stop;
 	}
 
 	// Command Events
 	if (command == up) {
 		motor.motor_up();
-		fill_solid(leds, NUM_LEDS, CRGB::Red);
+		fill_solid(leds, NUM_LEDS, color);
 		FastLED.show();
 	}
 	if (command == down) {
 		motor.motor_down();
-		fill_solid(leds, NUM_LEDS, CRGB::Red);
+		fill_solid(leds, NUM_LEDS, color);
 		FastLED.show();
 	}
 	if (command == stop) {
 		motor.motor_stop();
-		fill_solid(leds, NUM_LEDS, CRGB::Green);
+		fill_solid(leds, NUM_LEDS, color);
 		FastLED.show();
 		command = suspend;
 	}
 	if (command == manual_down) {
+		fill_solid(leds, NUM_LEDS, color);
+		FastLED.show();
 		motor.motor_down();
 	}
 	if (command == manual_up) {
+		fill_solid(leds, NUM_LEDS, color);
+		FastLED.show();
 		motor.motor_up();
 	}
 	if (command == suspend) {
 		motor.motor_suspend();
 	}
 	if (command == open_position) {
+		fill_solid(leds, NUM_LEDS, color);
+		FastLED.show();
 		command = stop;
 	}
 	if (command == closed_position) {
+		fill_solid(leds, NUM_LEDS, color);
+		FastLED.show();
 		command = stop;
 	}
 }
