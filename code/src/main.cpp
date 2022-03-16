@@ -26,7 +26,7 @@ const int endswitch_2 = A2;
 const int current_sensor = A3;
 
 unsigned long time_now = 0;
-unsigned long period = 2000;
+unsigned long interval = 2000;
 
 button pcb_button(signal_button, LOW, 100);
 button door_button(door_signal, HIGH, 100);
@@ -102,9 +102,9 @@ void loop()
 		Serial.println("Endschalter frei");
 	}
 
-	//Motor Currents reads ~0 Ampere if Motor is cut of within its enpositons,
-	//Hardeware switch turns Motor of and it is detected with an reading around
-	//0 from current_value()
+//Motor Currents reads ~0 Ampere if Motor is cut of within its enpositons,
+//Hardeware switch turns Motor of and it is detected with an reading around
+//0 from current_value()
 	if (current_value() == 0) {
 		if (command == up) {
 			Serial.println("Tor Offen ");
@@ -216,7 +216,8 @@ void loop()
 		motor.motor_up();
 	}
 	if (command == suspend) {
-		set_leds();
+		time_now = millis();
+		turn_leds_off();
 		motor.motor_suspend();
 	}
 	if (command == open_position) {
@@ -251,10 +252,9 @@ int current_value()
 }
 
 //Sets Leds to color for the given length of time, then turns the leds off.
-void set_leds()
+void turn_leds_off()
 {
-	if (millis() - time_now >= period){
-		time_now = millis();
+	if (millis() - time_now >= interval){
 		fill_solid(leds, NUM_LEDS, CRGB(0,0,0));
 		FastLED.show();
 	}

@@ -18,4 +18,4 @@ state last_command = boot;
 
 //Function Prototypes
 int current_value();
-void set_leds();
+void turn_leds_off();
