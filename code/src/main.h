@@ -15,5 +15,7 @@ enum state{
 
 state command = stop;
 state last_command = boot;
+
 //Function Prototypes
 int current_value();
+void set_leds();

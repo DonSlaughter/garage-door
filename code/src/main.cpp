@@ -25,6 +25,8 @@ const int endswitch_1 = A1;
 const int endswitch_2 = A2;
 const int current_sensor = A3;
 
+unsigned long time_now = 0;
+unsigned long period = 2000;
 
 button pcb_button(signal_button, LOW, 100);
 button door_button(door_signal, HIGH, 100);
@@ -168,7 +170,6 @@ void loop()
 		}
 	}
 
-
 	// Manual Button Events
 	if ((manual_down_button.event == button::Event::Pressed) && (command == suspend)){
 		color = CRGB::Blue;
@@ -215,6 +216,7 @@ void loop()
 		motor.motor_up();
 	}
 	if (command == suspend) {
+		set_leds();
 		motor.motor_suspend();
 	}
 	if (command == open_position) {
@@ -246,4 +248,14 @@ int current_value()
 	if ((value_sum < 20) && (value_sum > -20))  return 0;
 	if ((value_sum > 250) || (value_sum < -250)) return 512;
 	return value_sum;
+}
+
+//Sets Leds to color for the given length of time, then turns the leds off.
+void set_leds()
+{
+	if (millis() - time_now >= period){
+		time_now = millis();
+		fill_solid(leds, NUM_LEDS, CRGB(0,0,0));
+		FastLED.show();
+	}
 }
