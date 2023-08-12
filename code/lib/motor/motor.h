@@ -13,10 +13,10 @@ class motor
 			down,
 			suspend,
 		};
-		void motor_down();
-		void motor_up();
-		void motor_stop();
-		void motor_suspend();
+		void motor_down(void);
+		void motor_up(void);
+		void motor_stop(void);
+		void motor_suspend(void);
 private:
 		int _pin1;
 		int _pin2;

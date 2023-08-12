@@ -1,4 +1,4 @@
-#include <Arduino.h>
+//#include <Arduino.h>
 #include <FastLED.h>
 #include "motor.h"
 #include "button.h"
