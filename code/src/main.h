@@ -18,3 +18,4 @@ state last_command = boot;
 
 int current_value(void);
 void set_leds(void);
+void turn_leds_off(void);
