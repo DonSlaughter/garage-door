@@ -1,1 +1,3 @@
 .pio
+.cache
+complile_commands.json

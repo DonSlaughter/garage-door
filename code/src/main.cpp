@@ -1,4 +1,4 @@
-#include <Arduino.h>
+//#include <Arduino.h>
 #include <FastLED.h>
 #include "motor.h"
 #include "button.h"
@@ -246,7 +246,7 @@ int current_value()
 		value_sum += value;
 	}
 	value_sum = value_sum/5;
-	if ((value_sum < 20) && (value_sum > -20))  return 0;
+	if ((value_sum < 50) && (value_sum > -50))  return 0;
 	if ((value_sum > 250) || (value_sum < -250)) return 512;
 	return value_sum;
 }
